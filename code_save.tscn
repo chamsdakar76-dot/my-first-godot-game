@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://b8ngjdgcobsy6"]
+
+[ext_resource type="Script" uid="uid://dmafgrmgselkr" path="res://code_save.gd" id="1_oyc4f"]
+[ext_resource type="Script" uid="uid://c55b7oyh3ex6b" path="res://character_body_2d.gd" id="2_tcycc"]
+
+[node name="code_save" type="Node2D"]
+script = ExtResource("1_oyc4f")
+
+[node name="code" type="CharacterBody2D" parent="."]
+script = ExtResource("2_tcycc")
