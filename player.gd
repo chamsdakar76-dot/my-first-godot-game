@@ -1,14 +1,14 @@
 extends CharacterBody2D
-@onready var gravity = 2000
-@onready var jump_power = -1000
-@onready var walk = 350
-@onready var run = 700
-@onready var dash_power = 3500
-@onready var healthregn = 5
-@onready var health = 100
-@onready var knockback = Vector2(200,-300)
-@onready var cursed_energy = 100
-@onready var dash_charm = false
+@export var gravity = 2000
+@export var jump_power = -1000
+@export var walk = 350
+@export var run = 700
+@export var dash_power = 3500
+@export var healthregn = 5
+@export var health = 100
+@export var knockback = Vector2(200,-300)
+@export var cursed_energy = 100
+@export var dash_charm = false
 @onready var DASHCHECK = $PIVOT/DASHCHECK
 @onready var DASHCHECK2 =$PIVOT/DASHCHECK2
 @onready var DASHCHECK3 =$PIVOT/DASHCHECK3
@@ -177,7 +177,42 @@ func _physics_process(delta: float) -> void:
 	is_crawling = Is_on_wall_only and not injured
 	if paralysed:
 		is_crawling = false
-																													#endregion ----------
+		 																										#endregion ----------
+#region =====@DASH NORMAL AND ITS LOCK=====
+		if move_s == move_stat.dashing and can_dash and not injured:
+			if can_get_hit:
+				DASHCHECK.force_raycast_update()
+				DASHCHECK2.force_raycast_update()
+				DASHCHECK3.force_raycast_update()
+				if DASHCHECK.is_colliding():
+					dash_hurt1()
+				elif DASHCHECK2.is_colliding():
+					dash_hurt2()
+				elif DASHCHECK3.is_colliding():
+					dash_hurt3()
+				else:
+					can_dash = false
+					velocity.y = 0
+					movement_locked = true
+					$dashcool.start()
+					$dash_dashlock.start()
+					if dash_normal:
+						velocity.x = dash_power*lastdir
+																													#endregion
+#region =====@DASH WALL=====
+					if dash_wall :
+						velocity.x = -dash_power*Get_wall_normal
+																													#endregion
+#region =====@CRAWLING FREN AND TASFIR Y=====
+	if just_on_wall:
+		velocity.y = 0
+		if move_s == move_stat.dashing and not paralysed:
+			movement_locked = false
+			move_s = move_stat.normal
+	if not movement_locked and not paralysed:
+		if is_crawling and not jump_normal and 0 <= velocity.y:
+			velocity.y = 10000*delta
+																												#endregion
 
 		#==========GRAVITY/COYOTE AFFECTION TO IT==========
 
@@ -244,42 +279,6 @@ func _physics_process(delta: float) -> void:
 																												#endregion
 		if Input.is_action_just_released("ui_up") and velocity.y < 0: #=====@HIGHT JUMP FOR ALL CASES===== 
 			velocity.y *= 0.4
-		 #==========DEBUGING==========
-#region =====@DASH NORMAL AND ITS LOCK=====
-		if move_s == move_stat.dashing and can_dash and not injured:
-			if can_get_hit:
-				DASHCHECK.force_raycast_update()
-				DASHCHECK2.force_raycast_update()
-				DASHCHECK3.force_raycast_update()
-				if DASHCHECK.is_colliding():
-					dash_hurt1()
-				elif DASHCHECK2.is_colliding():
-					dash_hurt2()
-				elif DASHCHECK3.is_colliding():
-					dash_hurt3()
-				else:
-					can_dash = false
-					velocity.y = 0
-					movement_locked = true
-					$dashcool.start()
-					$dash_dashlock.start()
-					if dash_normal:
-						velocity.x = dash_power*lastdir
-																													#endregion
-#region =====@DASH WALL=====
-					if dash_wall :
-						velocity.x = -dash_power*Get_wall_normal
-																													#endregion
-#region =====@CRAWLING FREN AND TASFIR Y=====
-	if just_on_wall:
-		velocity.y = 0
-		if move_s == move_stat.dashing and not paralysed:
-			movement_locked = false
-			move_s = move_stat.normal
-	if not movement_locked and not paralysed:
-		if is_crawling and not jump_normal and 0 <= velocity.y:
-			velocity.y = 10000*delta
-																												#endregion
 
 	move_and_slide()        #=====MOVE AND SLIDE=====
 
